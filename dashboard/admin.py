@@ -22,6 +22,13 @@ class User_agents(admin.ModelAdmin):
     list_display = ('chrome_version','user_agent')
     list_filter = ('chrome_version',)
 
+
+@admin.register(Cookies)
+class Cookies(admin.ModelAdmin):
+    list_display = ('campaign','json_data')
+    list_filter = ('campaign',)
+
+
 admin.site.register(Chrome_versions)
 
 admin.site.register(CookieFile)

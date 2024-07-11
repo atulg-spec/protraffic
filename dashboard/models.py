@@ -1,6 +1,8 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+import zipfile
+import json
 
 SEARCH_ENGINES = [
     ('Google', 'Google'),
@@ -61,6 +63,7 @@ class Campaigns(models.Model):
     from_time = models.PositiveIntegerField(default=1)
     to_time = models.PositiveIntegerField(default=3)
     scroll_duration = models.PositiveIntegerField(default=30)
+    cookies_file = models.FileField(upload_to='cookies_zip/',null=True,blank=True)
     proxy_file = models.FileField(upload_to='proxies/')
 
     class Meta:
@@ -73,8 +76,10 @@ class Campaigns(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)
+        self.add_cookies_from_zip()
         if is_new and self.proxy_file:
             self.add_proxies_from_file()
+
                     
 
     def add_proxies_from_file(self):
@@ -87,6 +92,17 @@ class Campaigns(models.Model):
                             Proxy.objects.create(campaign=self, proxy=proxy)
         except Exception as e:
             raise ValidationError(f"Error saving proxies: {e}")
+        
+    def add_cookies_from_zip(self):
+        try:
+            with zipfile.ZipFile(self.cookies_file.path, 'r') as zip_ref:
+                for filename in zip_ref.namelist():
+                    with zip_ref.open(filename) as json_file:
+                        json_data = json.load(json_file)
+                        Cookies.objects.create(campaign=self, json_data=json_data)
+        except Exception as e:
+            raise ValidationError(f"Error saving cookies: {e}")
+
 
 class Proxy(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='proxies')
@@ -110,6 +126,21 @@ class CookieFile(models.Model):
 
     def __str__(self):
         return self.file.name
+
+
+class Cookies(models.Model):
+    campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE)
+    json_data = models.JSONField()
+
+    class Meta:
+        verbose_name = "Cookie"
+        verbose_name_plural = "Cookies"
+
+
+    def __str__(self):
+        return f"Cookies for {self.campaign.campaign_name}"
+
+
 
 class Tasks(models.Model):
     id = models.AutoField(primary_key=True)
