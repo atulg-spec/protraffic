@@ -20,13 +20,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # "paper_admin",
-    # "paper_admin.patches.dal",
-    # "paper_admin.patches.django_money",
-    # "paper_admin.patches.django_solo",
-    # "paper_admin.patches.mptt",
-    # "paper_admin.patches.logentry_admin",
-    # "paper_admin.patches.tree_queries",
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -71,12 +64,24 @@ WSGI_APPLICATION = 'protraffic.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':'django.db.backends.mysql',
+        'NAME': 'rbugtige_Traffic',
+        'USER': 'rbugtige_Traffic',
+        'PASSWORD': 'Kyppma2PHCnbZK2MGacq',
+        'HOST': 'lithium.scnservers.net',
+        'PORT':'3306',
     }
 }
+
 
 
 # Password validation
