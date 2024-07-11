@@ -14,19 +14,19 @@ SECRET_KEY = 'django-insecure-t@j9*d+@=kn%g=q7q=)c0!u!inf-*_-2jqr-9av+54p%w8!)uc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
     # "paper_admin",
-    # "paper_admin.patches.dal",           
-    # "paper_admin.patches.django_money",  
-    # "paper_admin.patches.django_solo",   
-    # "paper_admin.patches.mptt",          
+    # "paper_admin.patches.dal",
+    # "paper_admin.patches.django_money",
+    # "paper_admin.patches.django_solo",
+    # "paper_admin.patches.mptt",
     # "paper_admin.patches.logentry_admin",
-    # "paper_admin.patches.tree_queries", 
+    # "paper_admin.patches.tree_queries",
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -3,10 +3,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete.select2-container {
-    background: #f4f7fa !important;
-    height: calc(2.55rem + 2px);
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
+    min-height: 30px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single,
@@ -39,7 +36,7 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__rendered {
     color: var(--body-fg);
-    line-height: calc(2.55rem + 2px);
+    line-height: 30px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__clear {
@@ -55,7 +52,7 @@ select.admin-autocomplete {
 .select2-container--admin-autocomplete .select2-selection--single .select2-selection__arrow {
     height: 26px;
     position: absolute;
-    top: 7px;
+    top: 1px;
     right: 1px;
     width: 20px;
 }
@@ -198,10 +195,8 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-search--dropdown .select2-search__field {
-    /* background: var(--body-bg);
-    color: var(--body-fg); */
-    background-color: rgb(244, 247, 250);
-    color: #495057;
+    background: var(--body-bg);
+    color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
 }
@@ -218,10 +213,8 @@ select.admin-autocomplete {
 .select2-container--admin-autocomplete .select2-results > .select2-results__options {
     max-height: 200px;
     overflow-y: auto;
-    background-color: rgb(244, 247, 250);
-    color: #495057;
-    /* color: var(--body-fg);
-    background: var(--body-bg); */
+    color: var(--body-fg);
+    background: var(--body-bg);
 }
 
 .select2-container--admin-autocomplete .select2-results__option[role=group] {
@@ -272,7 +265,7 @@ select.admin-autocomplete {
 
 .select2-container--admin-autocomplete .select2-results__option--highlighted[aria-selected] {
     background-color: var(--primary);
-    color: white;
+    color: var(--primary-fg);
 }
 
 .select2-container--admin-autocomplete .select2-results__group {
