@@ -76,8 +76,8 @@ class Campaigns(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)
-        self.add_cookies_from_zip()
         if is_new and self.proxy_file:
+            self.add_cookies_from_zip()
             self.add_proxies_from_file()
 
                     
