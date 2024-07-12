@@ -249,6 +249,7 @@ class Tasks(models.Model):
         verbose_name_plural = "Tasks"
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.repetition_count <= self.repetition_done:
             self.status = 'completed'
             super().save(*args, **kwargs)
