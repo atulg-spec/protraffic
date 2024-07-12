@@ -14,6 +14,8 @@ def getcampaigns(request,user):
     campaign_data = {}
     now = timezone.localtime(timezone.now(), timezone=timezone.get_current_timezone())  # Get current datetime in Asia/Kolkata
     if task.schedule_at <= now:
+        task.repetition_done = task.repetition_done + 1
+        task.save()
         campaign = task.campaign
         proxiyOb = Proxy.objects.filter(campaign=task.campaign)
         proxies = []

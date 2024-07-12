@@ -248,6 +248,11 @@ class Tasks(models.Model):
         verbose_name = "Task"
         verbose_name_plural = "Tasks"
 
+    def save(self, *args, **kwargs):
+        if self.repetition_count <= self.repetition_done:
+            self.status = 'completed'
+            super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.campaign.campaign_name} - at {self.schedule_at}'
 
