@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import zipfile
 import json
+import pytz
+
+TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+
 
 SEARCH_ENGINES = [
     ('Google', 'Google'),
@@ -47,7 +51,7 @@ class Campaigns(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign_name = models.CharField(max_length=50, default="")
     domain_name = models.CharField(max_length=50, default="")
-    time_zone = models.CharField(max_length=50, default="America/New_York")
+    time_zone = models.CharField(max_length=32, choices=TIMEZONES,default='America/New_York')
     user_agents = models.ManyToManyField(Chrome_versions)
     extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
     urls = models.TextField(default="")
