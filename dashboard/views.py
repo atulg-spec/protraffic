@@ -30,7 +30,6 @@ def getcampaigns(request,user):
         cookies = [c.json_data for c in cook]
         campaign_data = {
             'id': campaign.id,
-            'user': campaign.user.username,
             'created_at': campaign.created_at.strftime('%Y-%m-%d %H:%M:%S') if campaign.created_at else None,
             'campaign_name': campaign.campaign_name,
             'domain_name': campaign.domain_name,
@@ -39,12 +38,10 @@ def getcampaigns(request,user):
             'urls': urls,
             'keywords': campaign.keywords,
             'search_engines': campaign.search_engines,
-            'repetition_count': campaign.repetition_count,
+            'repetition_count': task.repetition_count,
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
-            'count': campaign.count,
-            'from_time': campaign.from_time,
-            'to_time': campaign.to_time,
+            'count': task.count,
             'scroll_duration': campaign.scroll_duration,
             'proxies': proxies,
             'user_agents': user_agents,
