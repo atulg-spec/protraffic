@@ -242,6 +242,7 @@ class Tasks(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='tasks')
     schedule_at = models.DateTimeField()
     status = models.CharField(max_length=100, choices=STATUS, default="created")
+    facebook_campaign = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('campaign', 'schedule_at')

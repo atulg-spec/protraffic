@@ -34,6 +34,7 @@ def getcampaigns(request,user):
             'id': campaign.id,
             'created_at': campaign.created_at.strftime('%Y-%m-%d %H:%M:%S') if campaign.created_at else None,
             'campaign_name': campaign.campaign_name,
+            'facebook_campaign': task.facebook_campaign,
             'domain_name': campaign.domain_name,
             'time_zone': campaign.time_zone,
             'extension_path': campaign.extension_path,
