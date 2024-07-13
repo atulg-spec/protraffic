@@ -32,6 +32,19 @@ class Chrome_versions(models.Model):
         return f'{self.version}'
     
 
+class SearchEngine(models.Model):
+    engine = models.CharField(max_length=50)
+
+    class Meta:
+        unique_together = ('engine',)
+        verbose_name = "Search Engine"
+        verbose_name_plural = "Search Engines"
+
+    def __str__(self):
+        return f'{self.engine}'
+
+    
+
 class User_agents(models.Model):
     id = models.AutoField(primary_key=True)
     chrome_version = models.ForeignKey(Chrome_versions, on_delete=models.CASCADE)
@@ -56,7 +69,7 @@ class Campaigns(models.Model):
     extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
     urls = models.TextField(default="")
     keywords = models.TextField(default="")
-    search_engines = models.CharField(max_length=100, choices=SEARCH_ENGINES, default="Google")
+    search_engines = models.ManyToManyField(SearchEngine)
     visit_count_from = models.PositiveIntegerField(default=1)
     visit_count_to = models.PositiveIntegerField(default=1)
     scroll_duration = models.PositiveIntegerField(default=30)

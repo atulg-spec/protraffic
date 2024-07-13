@@ -31,7 +31,16 @@ def getcampaigns(request,user):
         if task.facebook_campaign:
             urls = campaign.urls.split(',')
         else:
-            urls = [f'https://www.google.com/search?q={keyword}' for keyword in keywords]
+            se = [s.engine for s in campaign.search_engines.all()]
+            print(se)
+            if 'Google' in se:
+                urls = urls + [f'https://www.google.com/search?q={keyword}' for keyword in keywords]
+            if 'Yahoo' in se:
+                urls = urls + [f'https://search.yahoo.com/search?p={keyword}' for keyword in keywords]
+            if 'Bing' in se:
+                urls = urls + [f'https://www.bing.com/search?q={keyword}' for keyword in keywords]
+            if 'Duck Duck Go' in se:
+                urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
         cookies = [c.json_data for c in cook]
         campaign_data = {
@@ -44,7 +53,6 @@ def getcampaigns(request,user):
             'extension_path': campaign.extension_path,
             'urls': urls,
             'keywords': campaign.keywords,
-            'search_engines': campaign.search_engines,
             'repetition_count': task.repetition_count,
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
