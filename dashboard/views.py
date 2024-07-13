@@ -27,7 +27,11 @@ def getcampaigns(request,user):
         if proxiyOb:
             proxies = [proxy.proxy for proxy in proxiyOb]
         keywords = campaign.keywords.split(',')
-        urls = [f'https://www.google.com/search?q={keyword}' for keyword in keywords]
+        urls = []
+        if task.facebook_campaign:
+            urls = campaign.urls.split(',')
+        else:
+            urls = [f'https://www.google.com/search?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
         cookies = [c.json_data for c in cook]
         campaign_data = {
