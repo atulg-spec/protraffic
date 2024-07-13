@@ -52,7 +52,7 @@ class UserAgentsFile(admin.ModelAdmin):
     list_filter = ('Chrome_version',)
 
 
-admin.site.register(SearchEngine)
+# admin.site.register(SearchEngine)
 admin.site.register(Chrome_versions)
 
 
