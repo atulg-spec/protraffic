@@ -30,7 +30,7 @@ class Chrome_versions(models.Model):
 
     def __str__(self):
         return f'{self.version}'
-    
+
 
 class SearchEngine(models.Model):
     engine = models.CharField(max_length=50)
@@ -43,7 +43,7 @@ class SearchEngine(models.Model):
     def __str__(self):
         return f'{self.engine}'
 
-    
+
 
 class User_agents(models.Model):
     id = models.AutoField(primary_key=True)
@@ -87,7 +87,7 @@ class Campaigns(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new and self.proxy_file:
-            self.add_cookies_from_zip()
+            # self.add_cookies_from_zip()
             self.add_proxies_from_file()
 
     def add_proxies_from_file(self):
@@ -100,7 +100,7 @@ class Campaigns(models.Model):
                             Proxy.objects.create(campaign=self, proxy=proxy)
         except Exception as e:
             raise ValidationError(f"Error saving proxies: {e}")
-        
+
     def add_cookies_from_zip(self):
         try:
             with zipfile.ZipFile(self.cookies_file.path, 'r') as zip_ref:
