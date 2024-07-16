@@ -23,7 +23,7 @@ def getcampaigns(request,user):
         for x in campaign.user_agents.all():
             ob = User_agents.objects.filter(chrome_version=x)
             for y in ob:
-                user_agents.append(y.user_agent)
+                user_agents.append({'userAgents':y.user_agent,'width':y.width,'height':y.height,'isMobile':y.isMobile})
         if proxiyOb:
             proxies = [proxy.proxy for proxy in proxiyOb]
         keywords = campaign.keywords.split(',')
@@ -42,7 +42,8 @@ def getcampaigns(request,user):
             if 'Duck Duck Go' in se:
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
-        cookies = [c.json_data for c in cook]
+        if cook:
+            cookies = [c.json_data for c in cook]
         campaign_data = {
             'id': campaign.id,
             'created_at': campaign.created_at.strftime('%Y-%m-%d %H:%M:%S') if campaign.created_at else None,
