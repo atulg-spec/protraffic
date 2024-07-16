@@ -49,6 +49,9 @@ class User_agents(models.Model):
     id = models.AutoField(primary_key=True)
     chrome_version = models.ForeignKey(Chrome_versions, on_delete=models.CASCADE)
     user_agent = models.CharField(max_length=200,default="")
+    width = models.PositiveIntegerField(default=1536)
+    height = models.PositiveIntegerField(default=864)
+    isMobile = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('chrome_version', 'user_agent')
@@ -87,8 +90,14 @@ class Campaigns(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new and self.proxy_file:
-            # self.add_cookies_from_zip()
-            self.add_proxies_from_file()
+            try:
+                self.add_cookies_from_zip()
+            except:
+                pass
+            try:
+                self.add_proxies_from_file()
+            except:
+                pass
 
     def add_proxies_from_file(self):
         try:

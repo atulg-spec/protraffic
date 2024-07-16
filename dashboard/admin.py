@@ -27,8 +27,8 @@ class Tasks(admin.ModelAdmin):
 
 @admin.register(User_agents)
 class User_agents(admin.ModelAdmin):
-    list_display = ('chrome_version','user_agent')
-    list_filter = ('chrome_version',)
+    list_display = ('chrome_version','user_agent','width','height','isMobile')
+    list_filter = ('chrome_version','isMobile')
 
 
 @admin.register(Cookies)
