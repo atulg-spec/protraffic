@@ -18,6 +18,7 @@ class Campaigns(admin.ModelAdmin):
 @admin.register(Proxy)
 class Proxy(admin.ModelAdmin):
     list_display = ('campaign','proxy')
+    list_filter = ('campaign',)
 
 @admin.register(Tasks)
 class Tasks(admin.ModelAdmin):
