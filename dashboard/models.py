@@ -132,7 +132,7 @@ class Proxy(models.Model):
 
     def save(self, *args, **kwargs):
         if self.proxy[0].isdigit():  # Check if proxy starts with a number
-            self.proxy = f'--proxy-server=socks5://{self.proxy}'
+            self.proxy = f'socks5://{self.proxy}'
         super().save(*args, **kwargs)
 
     def __str__(self):
