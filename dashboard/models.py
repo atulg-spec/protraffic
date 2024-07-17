@@ -130,6 +130,11 @@ class Proxy(models.Model):
         verbose_name = "Proxy"
         verbose_name_plural = "Proxies"
 
+    def save(self, *args, **kwargs):
+        if self.proxy[0].isdigit():  # Check if proxy starts with a number
+            self.proxy = f'--proxy-server=socks5://{self.proxy}'
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.campaign.campaign_name} - {self.proxy}'
 
