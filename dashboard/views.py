@@ -42,6 +42,7 @@ def getcampaigns(request,user):
             if 'Duck Duck Go' in se:
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
+        cookies = []
         if cook:
             cookies = [c.json_data for c in cook]
         campaign_data = {

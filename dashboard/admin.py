@@ -14,7 +14,7 @@ class Campaigns(admin.ModelAdmin):
         ('Extensions', {'fields': ('cookies_file','proxy_file')}),
     )
 
-
+admin.site.register(SearchEngine)
 @admin.register(Proxy)
 class Proxy(admin.ModelAdmin):
     list_display = ('campaign','proxy')
