@@ -265,6 +265,7 @@ class Tasks(models.Model):
     repetition_count = models.PositiveIntegerField(default=1)
     repetition_done = models.PositiveIntegerField(default=0)
     count = models.PositiveIntegerField(default=3)
+    profile_delay = models.PositiveIntegerField(default=5)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='tasks')
     schedule_at = models.DateTimeField()

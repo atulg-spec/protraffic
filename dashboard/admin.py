@@ -22,7 +22,7 @@ class Proxy(admin.ModelAdmin):
 
 @admin.register(Tasks)
 class Tasks(admin.ModelAdmin):
-    list_display = ('campaign','count','repetition_count','repetition_done','created_at','schedule_at','status')
+    list_display = ('campaign','count','profile_delay','repetition_count','repetition_done','created_at','schedule_at','status')
     list_filter = ('campaign','created_at','schedule_at','status')
 
 

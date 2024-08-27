@@ -59,6 +59,7 @@ def getcampaigns(request,user):
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
             'count': task.count,
+            'profile_delay': task.profile_delay,
             'scroll_duration': campaign.scroll_duration,
             'proxies': proxies,
             'user_agents': user_agents,
