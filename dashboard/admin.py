@@ -8,9 +8,10 @@ class Campaigns(admin.ModelAdmin):
     search_fields = ('campaign_name','domain_name','keywords','urls')
     fieldsets = (
         (None, {'fields': ('campaign_name', 'domain_name')}),
-        ('Browser Settings', {'fields': ('time_zone', 'user_agents', 'extension_path')}),
+        ('Time Zones', {'fields': ('time_zone',)}),
+        ('Browser Settings', {'fields': ('user_agents', 'extension_path')}),
         ('Campaign Info', {'fields': ('urls' ,'keywords', 'search_engines')}),
-        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'scroll_duration')}),
+        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'scroll_duration_from', 'scroll_duration_to','only_last_page_scroll_for_facebook')}),
         ('Extensions', {'fields': ('cookies_file','proxy_file')}),
     )
 
@@ -22,7 +23,7 @@ class Proxy(admin.ModelAdmin):
 
 @admin.register(Tasks)
 class Tasks(admin.ModelAdmin):
-    list_display = ('campaign','count','profile_delay','repetition_count','repetition_done','created_at','schedule_at','status')
+    list_display = ('campaign','profile','profile_delay','repetition_count','repetition_done','created_at','schedule_at','status')
     list_filter = ('campaign','created_at','schedule_at','status')
 
 

@@ -108,6 +108,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000  # Adjust this number based on your requirements
 STATIC_URL = 'static/'
 MEDIA_URL="/media/"
 STATIC_ROOT = 'static'

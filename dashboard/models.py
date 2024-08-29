@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import zipfile
 import json
+from multiselectfield import MultiSelectField
 import pytz
 
 TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
@@ -67,7 +68,7 @@ class Campaigns(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign_name = models.CharField(max_length=50, default="")
     domain_name = models.CharField(max_length=50, default="")
-    time_zone = models.CharField(max_length=32, choices=TIMEZONES,default='America/New_York')
+    time_zone = MultiSelectField(choices=TIMEZONES, default='America/New_York')
     user_agents = models.ManyToManyField(Chrome_versions)
     extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
     urls = models.TextField(default="")
@@ -75,7 +76,9 @@ class Campaigns(models.Model):
     search_engines = models.ManyToManyField(SearchEngine)
     visit_count_from = models.PositiveIntegerField(default=1)
     visit_count_to = models.PositiveIntegerField(default=1)
-    scroll_duration = models.PositiveIntegerField(default=30)
+    scroll_duration_from = models.PositiveIntegerField(default=10)
+    scroll_duration_to = models.PositiveIntegerField(default=30)
+    only_last_page_scroll_for_facebook = models.BooleanField(default=False)
     cookies_file = models.FileField(upload_to='cookies_zip/',null=True,blank=True)
     proxy_file = models.FileField(upload_to='proxies/')
 
@@ -131,12 +134,17 @@ class Proxy(models.Model):
         verbose_name_plural = "Proxies"
 
     def save(self, *args, **kwargs):
-        if self.proxy[0].isdigit():  # Check if proxy starts with a number
-            self.proxy = f'socks5://{self.proxy}'
+        # Check if the proxy is in the format f5d4933b78a2c523.yiu.us.ip2world.vip:6001:koko12-zone-resi-region-us-session-e3008223dca2-sessTime-5:zubidubi12
+        if ':' in self.proxy:
+            parts = self.proxy.split(':')
+            if len(parts) == 4:
+                # Rearrange the format to koko12-zone-resi-region-us-session-e3008223dca2-sessTime-5:zubidubi12@f5d4933b78a2c523.yiu.us.ip2world.vip:6001
+                self.proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.campaign.campaign_name} - {self.proxy}'
+
 
 class CookieFile(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='cookie_files', default=1)  # Set a default campaign ID
@@ -264,8 +272,8 @@ class Tasks(models.Model):
     user = models.ManyToManyField(User)
     repetition_count = models.PositiveIntegerField(default=1)
     repetition_done = models.PositiveIntegerField(default=0)
-    count = models.PositiveIntegerField(default=3)
-    profile_delay = models.PositiveIntegerField(default=5)
+    profile = models.PositiveIntegerField(default=3)
+    profile_delay = models.PositiveIntegerField(default=10)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='tasks')
     schedule_at = models.DateTimeField()

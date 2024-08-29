@@ -3,6 +3,7 @@ from .models import *
 from django.utils import timezone
 from django.http import JsonResponse
 import datetime
+import random
 
 # Create your views here.
 def getcampaigns(request,user):
@@ -17,7 +18,7 @@ def getcampaigns(request,user):
         task.repetition_done = task.repetition_done + 1
         task.save()
         campaign = task.campaign
-        proxiyOb = Proxy.objects.filter(campaign=task.campaign)
+        proxiyOb = Proxy.objects.filter(campaign=task.campaign)[:task.profile]
         proxies = []
         user_agents = []
         for x in campaign.user_agents.all():
@@ -26,6 +27,8 @@ def getcampaigns(request,user):
                 user_agents.append({'userAgents':y.user_agent,'width':y.width,'height':y.height,'isMobile':y.isMobile})
         if proxiyOb:
             proxies = [proxy.proxy for proxy in proxiyOb]
+            for x in proxiyOb:
+                x.delete()
         keywords = campaign.keywords.split(',')
         urls = []
         if task.facebook_campaign:
@@ -43,6 +46,7 @@ def getcampaigns(request,user):
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
         cookies = []
+        scroll_duration = random.randint(campaign.scroll_duration_from, campaign.scroll_duration_to)
         if cook:
             cookies = [c.json_data for c in cook]
         campaign_data = {
@@ -51,16 +55,18 @@ def getcampaigns(request,user):
             'campaign_name': campaign.campaign_name,
             'facebook_campaign': task.facebook_campaign,
             'domain_name': campaign.domain_name,
-            'time_zone': campaign.time_zone,
+            'time_zone': [zone for zone in campaign.time_zone],
             'extension_path': campaign.extension_path,
             'urls': urls,
+            'mainurls': campaign.urls.split(','),
             'keywords': campaign.keywords,
             'repetition_count': task.repetition_count,
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
-            'count': task.count,
+            'count': task.profile,
             'profile_delay': task.profile_delay,
-            'scroll_duration': campaign.scroll_duration,
+            'scroll_duration': scroll_duration,
+            'only_last_page_scroll_for_facebook': campaign.only_last_page_scroll_for_facebook,
             'proxies': proxies,
             'user_agents': user_agents,
             'cookies': cookies,
