@@ -5,8 +5,39 @@ import zipfile
 import json
 from multiselectfield import MultiSelectField
 import pytz
+import threading
+import requests
 
-TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+CONTINENTS = {
+    'Africa': [],
+    'Antarctica': [],
+    'Asia': [],
+    'Europe': [],
+    'North America': [],
+    'Oceania': [],
+    'South America': []
+}
+
+# Populate the CONTINENTS dictionary with timezones
+for tz in pytz.all_timezones:
+    if tz.startswith('Africa/'):
+        CONTINENTS['Africa'].append(tz)
+    elif tz.startswith('Antarctica/'):
+        CONTINENTS['Antarctica'].append(tz)
+    elif tz.startswith('Asia/'):
+        CONTINENTS['Asia'].append(tz)
+    elif tz.startswith('Europe/'):
+        CONTINENTS['Europe'].append(tz)
+    elif tz.startswith('America/') and 'Argentina' not in tz and 'Indiana' not in tz:
+        if 'South_America' in tz or 'Argentina' in tz:
+            CONTINENTS['South America'].append(tz)
+        else:
+            CONTINENTS['North America'].append(tz)
+    elif tz.startswith('Pacific/') or tz.startswith('Australia/') or tz.startswith('Indian/'):
+        CONTINENTS['Oceania'].append(tz)
+
+# Create continent choices for Django model
+CONTINENT_CHOICES = [(continent, continent) for continent in CONTINENTS.keys()]
 
 
 SEARCH_ENGINES = [
@@ -20,6 +51,13 @@ STATUS = [
         ('working', 'working'),
         ('completed', 'completed'),
     ]
+
+CONDITION = [
+        ('FETCHING', 'FETCHING'),
+        ('BAD', 'BAD'),
+        ('GOOD', 'GOOD'),
+    ]
+
 
 class Chrome_versions(models.Model):
     version = models.CharField(max_length=50)
@@ -62,25 +100,50 @@ class User_agents(models.Model):
     def __str__(self):
         return f'{self.user_agent}'
 
+TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+TIMEZONE_COUNTRIES = sorted(set([(pytz.country_names[code], pytz.country_names[code]) for code in pytz.country_names]))
+
+class PageBehaviour(models.Model):
+    scroll_duration_from = models.PositiveIntegerField(default=10)
+    scroll_duration_to = models.PositiveIntegerField(default=30)
+
+    class Meta:
+        verbose_name = "Page Behaviour"
+        verbose_name_plural = "Pages Behaviours"
+
+    def __str__(self):
+        return f'Scroll from {self.scroll_duration_from}-{self.scroll_duration_to}'
+
+class CampaignPage(models.Model):
+    campaign = models.ForeignKey('Campaigns', on_delete=models.CASCADE)
+    page = models.ForeignKey('PageBehaviour', on_delete=models.CASCADE)
+    sequence = models.PositiveIntegerField()  # Represents the order or sequence of the page
+
+    class Meta:
+        ordering = ['sequence']  # Ensures pages are retrieved in the correct order
+        unique_together = ('campaign', 'sequence')  # Ensures unique sequence number within a campaign
+
 
 class Campaigns(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign_name = models.CharField(max_length=50, default="")
     domain_name = models.CharField(max_length=50, default="")
+    continent = models.CharField(max_length=100, choices=CONTINENT_CHOICES, null=True, blank=True)
     time_zone = MultiSelectField(choices=TIMEZONES, default='America/New_York')
     user_agents = models.ManyToManyField(Chrome_versions)
+    facebook_post_div = models.CharField(max_length=200, default="div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
     extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
     urls = models.TextField(default="")
     keywords = models.TextField(default="")
     search_engines = models.ManyToManyField(SearchEngine)
     visit_count_from = models.PositiveIntegerField(default=1)
     visit_count_to = models.PositiveIntegerField(default=1)
-    scroll_duration_from = models.PositiveIntegerField(default=10)
-    scroll_duration_to = models.PositiveIntegerField(default=30)
+    direct_traffic = models.BooleanField(default=False)
+    pages = models.ManyToManyField(PageBehaviour, through='CampaignPage')  # Use the through model
     only_last_page_scroll_for_facebook = models.BooleanField(default=False)
-    cookies_file = models.FileField(upload_to='cookies_zip/',null=True,blank=True)
-    proxy_file = models.FileField(upload_to='proxies/')
+    cookies_file = models.FileField(upload_to='cookies_zip/', null=True, blank=True)
+    proxy_file = models.FileField(upload_to='proxies/',null=True,blank=True)
 
     class Meta:
         verbose_name = "Campaign"
@@ -90,17 +153,24 @@ class Campaigns(models.Model):
         return self.campaign_name
 
     def save(self, *args, **kwargs):
+        if self.continent:
+            self.time_zone = CONTINENTS.get(self.continent, [])
+
         is_new = self.pk is None
         super().save(*args, **kwargs)
-        if is_new and self.proxy_file:
-            try:
-                self.add_cookies_from_zip()
-            except:
-                pass
-            try:
-                self.add_proxies_from_file()
-            except:
-                pass
+
+        if is_new:
+            if self.cookies_file:
+                try:
+                    self.add_cookies_from_zip()
+                except Exception as e:
+                    raise ValidationError(f"Error saving cookies: {e}")
+
+            if self.proxy_file:
+                try:
+                    self.add_proxies_from_file()
+                except Exception as e:
+                    raise ValidationError(f"Error saving proxies: {e}")
 
     def add_proxies_from_file(self):
         try:
@@ -128,19 +198,86 @@ class Proxy(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='proxies')
     proxy = models.CharField(max_length=255)
 
+    # Fields to store IP-related data
+    ip_address = models.CharField(max_length=45, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    timezone = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=100, choices=CONDITION, default="FETCHING")
+
     class Meta:
         unique_together = ('campaign', 'proxy')
         verbose_name = "Proxy"
         verbose_name_plural = "Proxies"
 
     def save(self, *args, **kwargs):
-        # Check if the proxy is in the format f5d4933b78a2c523.yiu.us.ip2world.vip:6001:koko12-zone-resi-region-us-session-e3008223dca2-sessTime-5:zubidubi12
+        # Adjust proxy format if needed
         if ':' in self.proxy:
             parts = self.proxy.split(':')
             if len(parts) == 4:
-                # Rearrange the format to koko12-zone-resi-region-us-session-e3008223dca2-sessTime-5:zubidubi12@f5d4933b78a2c523.yiu.us.ip2world.vip:6001
                 self.proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
+
+        is_new = self._state.adding  # Check if the instance is newly created
+
+        # Save the model first to ensure the primary key exists
         super().save(*args, **kwargs)
+
+        # Perform the operation in a new thread only if the instance is newly created
+        if is_new:
+            threading.Thread(target=self.fetch_and_save_ip_details).start()
+
+        # Start a new thread to fetch and save IP details
+
+    def fetch_and_save_ip_details(self):
+        # Get IP address from proxy
+        proxy = {
+            'http': f'http://{self.proxy}',
+            'https': f'http://{self.proxy}'
+        }
+
+        try:
+            # Make the request to get IP
+            response = requests.get('https://api.ipify.org?format=json', proxies=proxy)
+            response.raise_for_status()
+            ip_data = response.json()
+            ip = ip_data.get('ip', None)
+            if ip:
+                # Make the request to get IP details
+                ip_info_response = requests.get(f'https://ipapi.co/{ip}/json/', proxies=proxy)
+                # ip_info_response.raise_for_status()
+                ip_info_data = ip_info_response.json()
+                
+                # Save IP details to model fields
+                self.ip_address = ip_info_data.get('ip', '')
+                self.city = ip_info_data.get('city', '')
+                self.region = ip_info_data.get('region', '')
+                self.country = ip_info_data.get('country_name', '')
+                self.latitude = ip_info_data.get('latitude', None)
+                self.longitude = ip_info_data.get('longitude', None)
+                self.timezone = ip_info_data.get('timezone', '')
+                if ip_info_data.get('timezone', '') not in self.campaign.time_zone:
+                    self.status = 'BAD'
+                else:
+                    self.status = 'GOOD'
+
+                # Save the updated fields to the database
+                with transaction.atomic():
+                    self.save(update_fields=['ip_address', 'city', 'region', 'country', 'latitude', 'longitude', 'timezone','status'])
+            else:
+                self.status = 'BAD'
+                with transaction.atomic():
+                    self.save(update_fields=['status'])
+                raise ValueError("IP address not found")
+
+        except (requests.exceptions.RequestException, ValueError) as e:
+            self.status = 'BAD'
+            with transaction.atomic():
+                self.save(update_fields=['status'])
+            print(f"Error: {e}")
+            # Delete the instance if there's an error
 
     def __str__(self):
         return f'{self.campaign.campaign_name} - {self.proxy}'
@@ -173,19 +310,16 @@ class CookieFile(models.Model):
     def __str__(self):
         return self.file.name
 
-
 class Proxyfile(models.Model):
     campaign = models.ForeignKey('Campaigns', on_delete=models.CASCADE, related_name='proxyfile', default=1)
     proxies = models.TextField(default='', null=True, blank=True)
-    file = models.FileField(upload_to='proxies/', blank=True, null=True)
-
+    file = models.FileField(upload_to='proxies/', blank=True, null=True)    
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.file:
             self.add_proxies_from_file()
         if self.proxies:
-            self.add_proxies_from_input()
-
+            self.add_proxies_from_input()   
     def add_proxies_from_file(self):
         try:
             with transaction.atomic():
@@ -195,8 +329,7 @@ class Proxyfile(models.Model):
                         if proxy:
                             Proxy.objects.get_or_create(campaign=self.campaign, proxy=proxy)
         except Exception as e:
-            raise ValidationError(f"Error saving proxies from file: {e}")
-
+            raise ValidationError(f"Error saving proxies from file: {e}")   
     def add_proxies_from_input(self):
         try:
             with transaction.atomic():
@@ -205,14 +338,13 @@ class Proxyfile(models.Model):
                     if proxy:
                         Proxy.objects.get_or_create(campaign=self.campaign, proxy=proxy)
         except Exception as e:
-            raise ValidationError(f"Error saving proxies from input: {e}")
-
+            raise ValidationError(f"Error saving proxies from input: {e}")  
     class Meta:
         verbose_name = "Proxy Upload"
-        verbose_name_plural = "Proxies Upload"
-
+        verbose_name_plural = "Proxies Upload"  
     def __str__(self):
         return self.file.name if self.file else "Proxy Upload"
+
 
 class UserAgentsFile(models.Model):
     Chrome_version = models.ForeignKey('Chrome_versions', on_delete=models.CASCADE, related_name='chromeversions', default=1)

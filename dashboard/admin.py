@@ -1,25 +1,52 @@
 from django.contrib import admin
 from .models import *
+# Inline model for managing pages with sequence in Campaigns
+class CampaignPageInline(admin.TabularInline):
+    model = CampaignPage
+    extra = 1  # Allows adding one extra page inline
+    ordering = ('sequence',)  # Order by sequence
 
 @admin.register(Campaigns)
-class Campaigns(admin.ModelAdmin):
-    list_display = ('campaign_name','domain_name','created_at')
-    list_filter = ('domain_name','created_at','time_zone')
-    search_fields = ('campaign_name','domain_name','keywords','urls')
+class CampaignsAdmin(admin.ModelAdmin):
+    list_display = ('campaign_name', 'domain_name', 'created_at', 'direct_traffic')
+    list_filter = ('domain_name', 'created_at', 'time_zone')
+    search_fields = ('campaign_name', 'domain_name', 'keywords', 'urls')
+    
     fieldsets = (
         (None, {'fields': ('campaign_name', 'domain_name')}),
-        ('Time Zones', {'fields': ('time_zone',)}),
-        ('Browser Settings', {'fields': ('user_agents', 'extension_path')}),
-        ('Campaign Info', {'fields': ('urls' ,'keywords', 'search_engines')}),
-        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'scroll_duration_from', 'scroll_duration_to','only_last_page_scroll_for_facebook')}),
-        ('Extensions', {'fields': ('cookies_file','proxy_file')}),
+        ('Time Zones', {'fields': ('continent', 'time_zone')}),
+        ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'extension_path')}),
+        ('Campaign Info', {'fields': ('urls', 'keywords', 'search_engines')}),
+        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'direct_traffic','only_last_page_scroll_for_facebook')}),
+        ('Extensions', {'fields': ('cookies_file', 'proxy_file')}),
     )
+    
+    inlines = [CampaignPageInline]  # Adding the inline model for pages
 
+# Register PageBehaviour separately
+admin.site.register(PageBehaviour)
+
+# Optionally, register the through model CampaignPage if you need it in the admin panel
+@admin.register(CampaignPage)
+class CampaignPageAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'page', 'sequence')
+    ordering = ('campaign', 'sequence')
 admin.site.register(SearchEngine)
-@admin.register(Proxy)
-class Proxy(admin.ModelAdmin):
-    list_display = ('campaign','proxy')
-    list_filter = ('campaign',)
+
+class ProxyAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'proxy', 'ip_address', 'city', 'region', 'country', 'timezone', 'latitude', 'longitude','status')
+    search_fields = ('proxy', 'ip_address', 'city', 'region', 'country')
+    list_filter = ('campaign', 'country', 'region', 'city','status')
+    readonly_fields = ('ip_address', 'city', 'region', 'country', 'latitude', 'longitude', 'timezone','status')
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+admin.site.register(Proxy, ProxyAdmin)
+
 
 @admin.register(Tasks)
 class Tasks(admin.ModelAdmin):

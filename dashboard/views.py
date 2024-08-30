@@ -18,20 +18,28 @@ def getcampaigns(request,user):
         task.repetition_done = task.repetition_done + 1
         task.save()
         campaign = task.campaign
-        proxiyOb = Proxy.objects.filter(campaign=task.campaign)[:task.profile]
+        proxiyOb = Proxy.objects.filter(campaign=task.campaign).filter(status='GOOD')[:task.profile]
         proxies = []
+        pages_with_sequence = CampaignPage.objects.filter(campaign=campaign).order_by('sequence')
+        # Prepare the pages list in the desired format
+        pages_data = [{
+            'sequence': page.sequence,
+            'scroll_duration_from': page.page.scroll_duration_from,
+            'scroll_duration_to': page.page.scroll_duration_to  # Replace 'name' with actual field names
+        } for page in pages_with_sequence]
         user_agents = []
         for x in campaign.user_agents.all():
             ob = User_agents.objects.filter(chrome_version=x)
             for y in ob:
                 user_agents.append({'userAgents':y.user_agent,'width':y.width,'height':y.height,'isMobile':y.isMobile})
         if proxiyOb:
-            proxies = [proxy.proxy for proxy in proxiyOb]
+            proxies = {proxy.proxy:proxy.timezone for proxy in proxiyOb}
             for x in proxiyOb:
                 x.delete()
+                pass
         keywords = campaign.keywords.split(',')
         urls = []
-        if task.facebook_campaign:
+        if task.facebook_campaign or campaign.direct_traffic:
             urls = campaign.urls.split(',')
         else:
             se = [s.engine for s in campaign.search_engines.all()]
@@ -46,7 +54,6 @@ def getcampaigns(request,user):
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         cook = Cookies.objects.filter(campaign=campaign)
         cookies = []
-        scroll_duration = random.randint(campaign.scroll_duration_from, campaign.scroll_duration_to)
         if cook:
             cookies = [c.json_data for c in cook]
         campaign_data = {
@@ -55,7 +62,7 @@ def getcampaigns(request,user):
             'campaign_name': campaign.campaign_name,
             'facebook_campaign': task.facebook_campaign,
             'domain_name': campaign.domain_name,
-            'time_zone': [zone for zone in campaign.time_zone],
+            'facebook_post_div': campaign.facebook_post_div,
             'extension_path': campaign.extension_path,
             'urls': urls,
             'mainurls': campaign.urls.split(','),
@@ -65,7 +72,7 @@ def getcampaigns(request,user):
             'visit_count_to': campaign.visit_count_to,
             'count': task.profile,
             'profile_delay': task.profile_delay,
-            'scroll_duration': scroll_duration,
+            'pages':pages_data,
             'only_last_page_scroll_for_facebook': campaign.only_last_page_scroll_for_facebook,
             'proxies': proxies,
             'user_agents': user_agents,
