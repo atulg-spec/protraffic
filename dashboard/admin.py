@@ -34,7 +34,7 @@ class CampaignPageAdmin(admin.ModelAdmin):
 admin.site.register(SearchEngine)
 
 class ProxyAdmin(admin.ModelAdmin):
-    list_display = ('campaign', 'proxy', 'ip_address', 'city', 'region', 'country', 'timezone', 'latitude', 'longitude','status')
+    list_display = ('campaign', 'proxy', 'ip_address', 'city', 'region', 'country', 'timezone','status')
     search_fields = ('proxy', 'ip_address', 'city', 'region', 'country')
     list_filter = ('campaign', 'country', 'region', 'city','status')
     readonly_fields = ('ip_address', 'city', 'region', 'country', 'latitude', 'longitude', 'timezone','status')
