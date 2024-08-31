@@ -232,54 +232,54 @@ class Proxy(models.Model):
         # Start a new thread to fetch and save IP details
 
     def fetch_and_save_ip_details(self):
-        import time
-        time.sleep(2)
-        # Get IP address from proxy
-        proxy = {
-            'http': f'http://{self.proxy}',
-            'https': f'http://{self.proxy}'
+        proxy = self.proxy
+        credentials, ip_port = proxy.split('@')
+        username, password = credentials.split(':')[0], credentials.split(':')[1]
+
+        # Setup the proxy dictionary with authentication for requests
+        proxies = {
+            "http": f"http://{username}:{password}@{ip_port}",
+            "https": f"https://{username}:{password}@{ip_port}",
         }
+        # Using an IP geolocation API like ipinfo.io or ip-api.com
+        url = "http://ip-api.com/json"
 
         try:
-            # Make the request to get IP
-            response = requests.get('https://api.ipify.org?format=json', proxies=proxy)
-            response.raise_for_status()
-            ip_data = response.json()
-            ip = ip_data.get('ip', None)
-            if ip:
-                # Make the request to get IP details
-                ip_info_response = requests.get(f'https://ipapi.co/{ip}/json/', proxies=proxy)
-                # ip_info_response.raise_for_status()
-                ip_info_data = ip_info_response.json()
-                
-                # Save IP details to model fields
-                self.ip_address = ip_info_data.get('ip', '')
-                self.city = ip_info_data.get('city', '')
-                self.region = ip_info_data.get('region', '')
-                self.country = ip_info_data.get('country_name', '')
-                self.latitude = ip_info_data.get('latitude', None)
-                self.longitude = ip_info_data.get('longitude', None)
-                self.timezone = ip_info_data.get('timezone', '')
-                if ip_info_data.get('timezone', '') not in self.campaign.time_zone:
-                    self.status = 'BAD'
-                else:
-                    self.status = 'GOOD'
+            # Make a request through the proxy
+            response = requests.get(url, proxies=proxies, timeout=10)
+            data = response.json()
 
-                # Save the updated fields to the database
-                with transaction.atomic():
-                    self.save(update_fields=['ip_address', 'city', 'region', 'country', 'latitude', 'longitude', 'timezone','status'])
-            else:
+            # Extract relevant information
+            ip_address = data.get("query", "N/A")
+            country = data.get("country", "N/A")
+            region = data.get("regionName", "N/A")
+            city = data.get("city", "N/A")
+            timezone = data.get("timezone", "N/A")
+
+            # Print the results
+            print(f"IP Address: {ip_address}")
+            print(f"Country: {country}")
+            print(f"Region: {region}")
+            print(f"City: {city}")
+            print(f"Timezone: {timezone}")
+
+            self.ip_address = ip_address
+            self.city = city
+            self.region = region
+            self.country = country
+            self.timezone = timezone
+            if timezone not in self.campaign.time_zone:
                 self.status = 'BAD'
-                with transaction.atomic():
-                    self.save(update_fields=['status'])
-                raise ValueError("IP address not found")
+            else:
+                self.status = 'GOOD'
+            with transaction.atomic():
+                self.save(update_fields=['ip_address', 'city', 'region', 'country', 'timezone','status'])
 
-        except (requests.exceptions.RequestException, ValueError) as e:
+        except requests.exceptions.RequestException as e:
             self.status = 'BAD'
             with transaction.atomic():
                 self.save(update_fields=['status'])
             print(f"Error: {e}")
-            # Delete the instance if there's an error
 
     def __str__(self):
         return f'{self.campaign.campaign_name} - {self.proxy}'
