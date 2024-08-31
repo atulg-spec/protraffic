@@ -232,6 +232,8 @@ class Proxy(models.Model):
         # Start a new thread to fetch and save IP details
 
     def fetch_and_save_ip_details(self):
+        import time
+        time.sleep(2)
         # Get IP address from proxy
         proxy = {
             'http': f'http://{self.proxy}',
