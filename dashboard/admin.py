@@ -15,7 +15,7 @@ class CampaignsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('campaign_name', 'domain_name')}),
         ('Time Zones', {'fields': ('continent', 'time_zone')}),
-        ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'extension_path')}),
+        ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'facebook_ads_div', 'extension_path')}),
         ('Campaign Info', {'fields': ('urls', 'keywords', 'search_engines')}),
         ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'direct_traffic','only_last_page_scroll_for_facebook')}),
         ('Extensions', {'fields': ('cookies_file', 'proxy_file')}),

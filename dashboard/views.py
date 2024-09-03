@@ -63,6 +63,7 @@ def getcampaigns(request,user):
             'facebook_campaign': task.facebook_campaign,
             'domain_name': campaign.domain_name,
             'facebook_post_div': campaign.facebook_post_div,
+            'facebook_ads_div': campaign.facebook_ads_div,
             'extension_path': campaign.extension_path,
             'urls': urls,
             'mainurls': campaign.urls.split(','),

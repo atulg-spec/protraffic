@@ -133,6 +133,7 @@ class Campaigns(models.Model):
     time_zone = MultiSelectField(choices=TIMEZONES, default='America/New_York')
     user_agents = models.ManyToManyField(Chrome_versions)
     facebook_post_div = models.CharField(max_length=200, default="div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
+    facebook_ads_div = models.CharField(max_length=200, default="div.search__result__wrapper")
     extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
     urls = models.TextField(default="")
     keywords = models.TextField(default="")
