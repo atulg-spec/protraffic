@@ -215,8 +215,8 @@ class Proxy(models.Model):
         verbose_name_plural = "Proxies"
 
     def save(self, *args, **kwargs):
-        # Adjust proxy format if needed
-        if ':' in self.proxy:
+        # Adjust proxy format if needed (for HTTP/HTTPS proxies)
+        if ':' in self.proxy and '@' not in self.proxy:
             parts = self.proxy.split(':')
             if len(parts) == 4:
                 self.proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
@@ -230,51 +230,51 @@ class Proxy(models.Model):
         if is_new:
             threading.Thread(target=self.fetch_and_save_ip_details).start()
 
-        # Start a new thread to fetch and save IP details
-
     def fetch_and_save_ip_details(self):
         proxy = self.proxy
-        credentials, ip_port = proxy.split('@')
-        username, password = credentials.split(':')[0], credentials.split(':')[1]
 
-        # Setup the proxy dictionary with authentication for requests
-        proxies = {
-            "http": f"http://{username}:{password}@{ip_port}",
-            "https": f"https://{username}:{password}@{ip_port}",
-        }
-        # Using an IP geolocation API like ipinfo.io or ip-api.com
+        if '@' in proxy:
+            credentials, ip_port = proxy.split('@')
+            username, password = credentials.split(':')[0], credentials.split(':')[1]
+
+            proxies = {
+                "http": f"http://{username}:{password}@{ip_port}",
+                "https": f"https://{username}:{password}@{ip_port}",
+            }
+        else:
+            # Assume SOCKS5 format (ip:port)
+            ip_port = proxy
+            proxies = {
+                "http": f"socks5://{ip_port}",
+                "https": f"socks5://{ip_port}",
+            }
+
         url = "http://ip-api.com/json"
 
         try:
-            # Make a request through the proxy
             response = requests.get(url, proxies=proxies, timeout=10)
             data = response.json()
 
-            # Extract relevant information
             ip_address = data.get("query", "N/A")
             country = data.get("country", "N/A")
             region = data.get("regionName", "N/A")
             city = data.get("city", "N/A")
             timezone = data.get("timezone", "N/A")
 
-            # Print the results
-            print(f"IP Address: {ip_address}")
-            print(f"Country: {country}")
-            print(f"Region: {region}")
-            print(f"City: {city}")
-            print(f"Timezone: {timezone}")
-
             self.ip_address = ip_address
             self.city = city
             self.region = region
             self.country = country
             self.timezone = timezone
+
+            # Check the timezone against the campaign
             if timezone not in self.campaign.time_zone:
                 self.status = 'BAD'
             else:
                 self.status = 'GOOD'
+            
             with transaction.atomic():
-                self.save(update_fields=['ip_address', 'city', 'region', 'country', 'timezone','status'])
+                self.save(update_fields=['ip_address', 'city', 'region', 'country', 'timezone', 'status'])
 
         except requests.exceptions.RequestException as e:
             self.status = 'BAD'
@@ -284,6 +284,7 @@ class Proxy(models.Model):
 
     def __str__(self):
         return f'{self.campaign.campaign_name} - {self.proxy}'
+
 
 
 class CookieFile(models.Model):
