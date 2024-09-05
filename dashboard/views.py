@@ -36,7 +36,6 @@ def getcampaigns(request,user):
             proxies = {proxy.proxy:proxy.timezone for proxy in proxiyOb}
             for x in proxiyOb:
                 x.delete()
-                pass
         keywords = campaign.keywords.split(',')
         urls = []
         if task.facebook_campaign or campaign.direct_traffic:
