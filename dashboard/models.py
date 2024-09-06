@@ -231,7 +231,11 @@ class Proxy(models.Model):
             threading.Thread(target=self.fetch_and_save_ip_details).start()
 
     def fetch_and_save_ip_details(self):
+        import time
+        time.sleep(1)
         proxy = self.proxy
+        print('here')
+        print(proxy)
 
         if '@' in proxy:
             credentials, ip_port = proxy.split('@')
