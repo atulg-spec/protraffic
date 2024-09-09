@@ -238,12 +238,13 @@ class Proxy(models.Model):
         print(proxy)
 
         if '@' in proxy:
+            print('@')
             credentials, ip_port = proxy.split('@')
             username, password = credentials.split(':')[0], credentials.split(':')[1]
 
             proxies = {
-                "http": f"http://{username}:{password}@{ip_port}",
-                "https": f"https://{username}:{password}@{ip_port}",
+                "http": f'http://{proxy}',
+                "https": f'http://{proxy}',
             }
         else:
             # Assume SOCKS5 format (ip:port)
@@ -253,15 +254,16 @@ class Proxy(models.Model):
                 "https": f"socks5://{ip_port}",
             }
 
-        url = "http://ip-api.com/json"
+        url = "https://ipwhois.app/json/"
 
         try:
             response = requests.get(url, proxies=proxies, timeout=10)
             data = response.json()
+            print(data)
 
-            ip_address = data.get("query", "N/A")
+            ip_address = data.get("ip", "N/A")
             country = data.get("country", "N/A")
-            region = data.get("regionName", "N/A")
+            region = data.get("region", "N/A")
             city = data.get("city", "N/A")
             timezone = data.get("timezone", "N/A")
 

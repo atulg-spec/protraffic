@@ -1,36 +1,27 @@
 import requests
 
-def get_geolocation(proxy):
-    # Set up the proxy for the request
-    proxies = {
-        'http': f'http://{proxy}',
-        'https': f'http://{proxy}'
-    }
-    
-    # API URL for IP information
-    url = 'https://ipinfo.io/json'
-    
-    try:
-        # Make a request to the geolocation API via the proxy
-        response = requests.get(url, proxies=proxies, timeout=10)
-        data = response.json()
+# URL for the IP lookup
+url = 'https://ipwhois.app/json/'
 
-        if 'ip' in data:
-            print(f"IP: {data['ip']}")
-            print(f"City: {data['city']}")
-            print(f"Region: {data['region']}")
-            print(f"Country: {data['country']}")
-            print(f"Location: {data['loc']}")
-            print(f"ISP: {data.get('org', 'N/A')}")
-        else:
-            print(f"Failed to retrieve geolocation. Response: {data}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting through proxy {proxy}: {e}")
+# Proxy details
+proxy = {
+    "http": "http://fazli31-zone-resi-region-us-session-c168983aabda-sessTime-120:rabi786@4e52f83007cd8a41.ika.na.pyproxy.io:16666",
+    "https": "http://fazli31-zone-resi-region-us-session-c168983aabda-sessTime-120:rabi786@4e52f83007cd8a41.ika.na.pyproxy.io:16666"
+}
 
-# Example proxy
-proxy = "162.19.7.56:32437"
-get_geolocation(proxy)
-proxy = "162.0.220.217:48824"	
-get_geolocation(proxy)
-proxy = "162.0.220.161:31963"
-get_geolocation(proxy)
+try:
+    # Making the request using the proxy
+    response = requests.get(url, proxies=proxy, timeout=10)
+
+    # Checking if the request was successful
+    if response.status_code == 200:
+        print("Response JSON:", response.json())
+    else:
+        print(f"Failed to retrieve data. Status code: {response.status_code}")
+
+except requests.exceptions.ProxyError as e:
+    print(f"Proxy error: {e}")
+except requests.exceptions.Timeout:
+    print("The request timed out")
+except Exception as e:
+    print(f"An error occurred: {e}")

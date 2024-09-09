@@ -35,6 +35,7 @@ def getcampaigns(request,user):
         if proxiyOb:
             proxies = {proxy.proxy:proxy.timezone for proxy in proxiyOb}
             for x in proxiyOb:
+                # pass
                 x.delete()
         keywords = campaign.keywords.split(',')
         urls = []

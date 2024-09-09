@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-t@j9*d+@=kn%g=q7q=)c0!u!inf-*_-2jqr-9av+54p%w8!)uc'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -111,11 +111,11 @@ USE_TZ = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000  # Adjust this number based on your requirements
 STATIC_URL = 'static/'
 MEDIA_URL="/media/"
-# STATIC_ROOT = 'static'
+STATIC_ROOT = 'static'
 
-STATICFILES_DIRS =[
-    os.path.join(BASE_DIR, "static"),
-]
+# STATICFILES_DIRS =[
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
