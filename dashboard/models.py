@@ -217,6 +217,7 @@ class Proxy(models.Model):
     def save(self, *args, **kwargs):
         # Adjust proxy format if needed (for HTTP/HTTPS proxies)
         if ':' in self.proxy and '@' not in self.proxy:
+            self.status = 'GOOD'
             parts = self.proxy.split(':')
             if len(parts) == 4:
                 self.proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
@@ -227,7 +228,7 @@ class Proxy(models.Model):
         super().save(*args, **kwargs)
 
         # Perform the operation in a new thread only if the instance is newly created
-        if is_new:
+        if is_new and self.status == 'FETCHING':
             threading.Thread(target=self.fetch_and_save_ip_details).start()
 
     def fetch_and_save_ip_details(self):
