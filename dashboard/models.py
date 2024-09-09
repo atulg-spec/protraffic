@@ -217,11 +217,13 @@ class Proxy(models.Model):
     def save(self, *args, **kwargs):
         # Adjust proxy format if needed (for HTTP/HTTPS proxies)
         if ':' in self.proxy and '@' not in self.proxy:
-            self.status = 'GOOD'
             parts = self.proxy.split(':')
             if len(parts) == 4:
                 self.proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
 
+        if '@' not in self.proxy:
+            self.status = 'GOOD'
+            
         is_new = self._state.adding  # Check if the instance is newly created
 
         # Save the model first to ensure the primary key exists
