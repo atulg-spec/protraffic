@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-t@j9*d+@=kn%g=q7q=)c0!u!inf-*_-2jqr-9av+54p%w8!)uc'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -111,7 +111,7 @@ USE_TZ = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000  # Adjust this number based on your requirements
 STATIC_URL = 'static/'
 MEDIA_URL="/media/"
-MEDIA_ROOT = 'static'
+MEDIA_ROOT = 'media'
 STATIC_ROOT = 'static'
 
 # STATICFILES_DIRS =[
