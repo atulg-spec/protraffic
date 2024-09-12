@@ -111,6 +111,7 @@ USE_TZ = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000  # Adjust this number based on your requirements
 STATIC_URL = 'static/'
 MEDIA_URL="/media/"
+MEDIA_ROOT = 'static'
 STATIC_ROOT = 'static'
 
 # STATICFILES_DIRS =[

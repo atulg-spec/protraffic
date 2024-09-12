@@ -1,8 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-import zipfile
-import json
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 import pytz
 import threading
@@ -130,20 +129,21 @@ class Campaigns(models.Model):
     campaign_name = models.CharField(max_length=50, default="")
     domain_name = models.CharField(max_length=50, default="")
     continent = models.CharField(max_length=100, choices=CONTINENT_CHOICES, null=True, blank=True)
-    time_zone = MultiSelectField(choices=TIMEZONES, default='America/New_York')
+    time_zone = MultiSelectField(choices=TIMEZONES, default='America/New_York',null=True,blank=True)
     user_agents = models.ManyToManyField(Chrome_versions)
     facebook_post_div = models.CharField(max_length=200, default="div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
     facebook_ads_div = models.CharField(max_length=200, default="div.search__result__wrapper")
-    extension_path = models.CharField(max_length=100, default="C:/Users/Administrator/Desktop/WebRTC-Leak-Prevent")
-    urls = models.TextField(default="")
-    keywords = models.TextField(default="")
+    direct_urls = models.TextField(default="",null=True,blank=True)
+    urls = models.TextField(default="",null=True,blank=True)
+    keywords = models.TextField(default="",null=True,blank=True)
     search_engines = models.ManyToManyField(SearchEngine)
     visit_count_from = models.PositiveIntegerField(default=1)
     visit_count_to = models.PositiveIntegerField(default=1)
+    selection_on_page = models.BooleanField(default=True)
     direct_traffic = models.BooleanField(default=False)
+    click_anywhere = models.BooleanField(default=False)
     pages = models.ManyToManyField(PageBehaviour, through='CampaignPage')  # Use the through model
-    only_last_page_scroll_for_facebook = models.BooleanField(default=False)
-    cookies_file = models.FileField(upload_to='cookies_zip/', null=True, blank=True)
+    cookies_folder = models.CharField(max_length=50, default="Empty")
     proxy_file = models.FileField(upload_to='proxies/',null=True,blank=True)
 
     class Meta:
@@ -161,12 +161,6 @@ class Campaigns(models.Model):
         super().save(*args, **kwargs)
 
         if is_new:
-            if self.cookies_file:
-                try:
-                    self.add_cookies_from_zip()
-                except Exception as e:
-                    raise ValidationError(f"Error saving cookies: {e}")
-
             if self.proxy_file:
                 try:
                     self.add_proxies_from_file()
@@ -184,17 +178,7 @@ class Campaigns(models.Model):
         except Exception as e:
             raise ValidationError(f"Error saving proxies: {e}")
 
-    def add_cookies_from_zip(self):
-        try:
-            with zipfile.ZipFile(self.cookies_file.path, 'r') as zip_ref:
-                for filename in zip_ref.namelist():
-                    with zip_ref.open(filename) as json_file:
-                        json_data = json.load(json_file)
-                        Cookies.objects.create(campaign=self, json_data=json_data)
-        except Exception as e:
-            raise ValidationError(f"Error saving cookies: {e}")
-
-
+  
 class Proxy(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='proxies')
     proxy = models.CharField(max_length=255)
@@ -295,34 +279,6 @@ class Proxy(models.Model):
         return f'{self.campaign.campaign_name} - {self.proxy}'
 
 
-
-class CookieFile(models.Model):
-    campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='cookie_files', default=1)  # Set a default campaign ID
-    file = models.FileField(upload_to='cookies/')
-
-    def save(self, *args, **kwargs):
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
-        if is_new and self.file:
-            self.add_cookies_from_zip()
-
-    def add_cookies_from_zip(self):
-        try:
-            with zipfile.ZipFile(self.file.path, 'r') as zip_ref:
-                for filename in zip_ref.namelist():
-                    with zip_ref.open(filename) as json_file:
-                        json_data = json.load(json_file)
-                        Cookies.objects.create(campaign=self.campaign, json_data=json_data)
-        except Exception as e:
-            raise ValidationError(f"Error saving cookies: {e}")
-
-    class Meta:
-        verbose_name = "Cookie Upload"
-        verbose_name_plural = "Cookies Upload"
-
-    def __str__(self):
-        return self.file.name
-
 class Proxyfile(models.Model):
     campaign = models.ForeignKey('Campaigns', on_delete=models.CASCADE, related_name='proxyfile', default=1)
     proxies = models.TextField(default='', null=True, blank=True)
@@ -399,18 +355,6 @@ class UserAgentsFile(models.Model):
     def __str__(self):
         return self.file.name if self.file else "User Agents Upload"
 
-class Cookies(models.Model):
-    campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE)
-    json_data = models.JSONField()
-
-    class Meta:
-        verbose_name = "Cookie"
-        verbose_name_plural = "Cookies"
-
-    def __str__(self):
-        return f"Cookies for {self.campaign.campaign_name}"
-
-
 
 class Tasks(models.Model):
     id = models.AutoField(primary_key=True)
@@ -421,7 +365,7 @@ class Tasks(models.Model):
     profile_delay = models.PositiveIntegerField(default=10)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='tasks')
-    schedule_at = models.DateTimeField()
+    schedule_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=100, choices=STATUS, default="created")
     facebook_campaign = models.BooleanField(default=False)
 
@@ -438,5 +382,3 @@ class Tasks(models.Model):
 
     def __str__(self):
         return f'{self.campaign.campaign_name} - at {self.schedule_at}'
-
-

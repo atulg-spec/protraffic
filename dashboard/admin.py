@@ -15,10 +15,10 @@ class CampaignsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('campaign_name', 'domain_name')}),
         ('Time Zones', {'fields': ('continent', 'time_zone')}),
-        ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'facebook_ads_div', 'extension_path')}),
-        ('Campaign Info', {'fields': ('urls', 'keywords', 'search_engines')}),
-        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'direct_traffic','only_last_page_scroll_for_facebook')}),
-        ('Extensions', {'fields': ('cookies_file', 'proxy_file')}),
+        ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'facebook_ads_div')}),
+        ('Campaign Info', {'fields': ('urls', 'keywords','direct_urls' ,'search_engines')}),
+        ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'direct_traffic', 'click_anywhere','selection_on_page')}),
+        ('Extensions', {'fields': ('cookies_folder', 'proxy_file')}),
     )
     
     inlines = [CampaignPageInline]  # Adding the inline model for pages
@@ -53,22 +53,17 @@ class Tasks(admin.ModelAdmin):
     list_display = ('campaign','profile','profile_delay','repetition_count','repetition_done','created_at','schedule_at','status')
     list_filter = ('campaign','created_at','schedule_at','status')
 
+    fieldsets = (
+        (None, {'fields': ('user','status')}),
+        ('Campaign Settings', {'fields': ('campaign','profile','profile_delay','repetition_count','repetition_done')}),
+        ('Additional Settings', {'fields': ('facebook_campaign','schedule_at')}),
+    )
+
 
 @admin.register(User_agents)
 class User_agents(admin.ModelAdmin):
     list_display = ('chrome_version','user_agent','width','height','isMobile')
     list_filter = ('chrome_version','isMobile')
-
-
-@admin.register(Cookies)
-class Cookies(admin.ModelAdmin):
-    list_display = ('campaign','json_data')
-    list_filter = ('campaign',)
-
-@admin.register(CookieFile)
-class CookieFile(admin.ModelAdmin):
-    list_display = ('campaign','file')
-    list_filter = ('campaign',)
 
 @admin.register(Proxyfile)
 class Proxyfile(admin.ModelAdmin):
@@ -80,10 +75,8 @@ class UserAgentsFile(admin.ModelAdmin):
     list_display = ('Chrome_version','file')
     list_filter = ('Chrome_version',)
 
-
 # admin.site.register(SearchEngine)
 admin.site.register(Chrome_versions)
-
 
 # ----------Admin Customization------------
 admin.site.site_header = "Traffic Buddy Admin"

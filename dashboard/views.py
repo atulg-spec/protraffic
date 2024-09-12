@@ -2,8 +2,7 @@ from django.shortcuts import render
 from .models import *
 from django.utils import timezone
 from django.http import JsonResponse
-import datetime
-import random
+from protraffic.settings import MEDIA_ROOT
 
 # Create your views here.
 def getcampaigns(request,user):
@@ -13,8 +12,10 @@ def getcampaigns(request,user):
         return JsonResponse({'status':False,'data':{}}, safe=False)
     # Serialize campaigns data
     campaign_data = {}
+    
     now = timezone.localtime(timezone.now(), timezone=timezone.get_current_timezone())  # Get current datetime in Asia/Kolkata
     if task.schedule_at <= now:
+        campaign_time = 0
         task.repetition_done = task.repetition_done + 1
         task.save()
         campaign = task.campaign
@@ -27,6 +28,11 @@ def getcampaigns(request,user):
             'scroll_duration_from': page.page.scroll_duration_from,
             'scroll_duration_to': page.page.scroll_duration_to  # Replace 'name' with actual field names
         } for page in pages_with_sequence]
+        for x in pages_data:
+            campaign_time = campaign_time + x['scroll_duration_to']
+        campaign_time = campaign_time + (task.profile_delay * task.profile) 
+        if task.facebook_campaign:
+            campaign_time = campaign_time + (40 * task.profile_delay)
         user_agents = []
         for x in campaign.user_agents.all():
             ob = User_agents.objects.filter(chrome_version=x)
@@ -39,8 +45,10 @@ def getcampaigns(request,user):
                 x.delete()
         keywords = campaign.keywords.split(',')
         urls = []
-        if task.facebook_campaign or campaign.direct_traffic:
+        if task.facebook_campaign:
             urls = campaign.urls.split(',')
+        elif campaign.direct_traffic:
+            urls = campaign.direct_urls.split(',')
         else:
             se = [s.engine for s in campaign.search_engines.all()]
             print(se)
@@ -52,10 +60,6 @@ def getcampaigns(request,user):
                 urls = urls + [f'https://www.bing.com/search?q={keyword}' for keyword in keywords]
             if 'Duck Duck Go' in se:
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
-        cook = Cookies.objects.filter(campaign=campaign)
-        cookies = []
-        if cook:
-            cookies = [c.json_data for c in cook]
         campaign_data = {
             'id': campaign.id,
             'created_at': campaign.created_at.strftime('%Y-%m-%d %H:%M:%S') if campaign.created_at else None,
@@ -64,20 +68,21 @@ def getcampaigns(request,user):
             'domain_name': campaign.domain_name,
             'facebook_post_div': campaign.facebook_post_div,
             'facebook_ads_div': campaign.facebook_ads_div,
-            'extension_path': campaign.extension_path,
             'urls': urls,
+            'click_anywhere': campaign.click_anywhere,
             'mainurls': campaign.urls.split(','),
             'keywords': campaign.keywords,
             'repetition_count': task.repetition_count,
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
+            'selection_on_page': campaign.selection_on_page,
             'count': task.profile,
             'profile_delay': task.profile_delay,
             'pages':pages_data,
-            'only_last_page_scroll_for_facebook': campaign.only_last_page_scroll_for_facebook,
             'proxies': proxies,
+            'campaign_time': campaign_time,
+            'cookies_folder': campaign.cookies_folder,
             'user_agents': user_agents,
-            'cookies': cookies,
         }
     
     # Return JSON response
@@ -92,3 +97,12 @@ def repetitiondone(request,id):
     except:
         pass
     return JsonResponse({'status':True})
+
+from django.http import FileResponse
+import os
+
+def download_zip(request):
+    file_path = os.path.join(MEDIA_ROOT, 'WebRTC-Leak-Prevent.zip')
+    response = FileResponse(open(file_path, 'rb'))
+    response['Content-Disposition'] = 'attachment; filename="WebRTC-Leak-Prevent.zip"'
+    return response
