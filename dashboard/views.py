@@ -76,7 +76,7 @@ def getcampaigns(request,user):
             'visit_count_from': campaign.visit_count_from,
             'visit_count_to': campaign.visit_count_to,
             'selection_on_page': campaign.selection_on_page,
-            'count': task.profile,
+            'count': proxies.__len__(),
             'profile_delay': task.profile_delay,
             'pages':pages_data,
             'proxies': proxies,
