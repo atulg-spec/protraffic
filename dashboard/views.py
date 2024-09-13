@@ -27,7 +27,8 @@ def getcampaigns(request,user):
             'sequence': page.sequence,
             'scroll_duration_from': page.page.scroll_duration_from,
             'scroll_duration_to': page.page.scroll_duration_to,  # Replace 'name' with actual field names
-            'click_selector': page.page.click_selector  # Replace 'name' with actual field names
+            'click_selector': page.page.click_selector,  # Replace 'name' with actual field names
+            'is_iframe': page.page.is_iframe,  # Replace 'name' with actual field names
         } for page in pages_with_sequence]
         for x in pages_data:
             campaign_time = campaign_time + x['scroll_duration_to']

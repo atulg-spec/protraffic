@@ -106,6 +106,7 @@ class PageBehaviour(models.Model):
     scroll_duration_from = models.PositiveIntegerField(default=10)
     scroll_duration_to = models.PositiveIntegerField(default=30)
     click_selector = models.CharField(max_length=500,default="body")
+    is_iframe = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Page Behaviour"
