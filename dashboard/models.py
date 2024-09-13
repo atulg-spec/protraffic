@@ -105,6 +105,7 @@ TIMEZONE_COUNTRIES = sorted(set([(pytz.country_names[code], pytz.country_names[c
 class PageBehaviour(models.Model):
     scroll_duration_from = models.PositiveIntegerField(default=10)
     scroll_duration_to = models.PositiveIntegerField(default=30)
+    click_selector = models.CharField(max_length=500,default="a")
 
     class Meta:
         verbose_name = "Page Behaviour"
