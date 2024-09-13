@@ -133,6 +133,7 @@ class Campaigns(models.Model):
     user_agents = models.ManyToManyField(Chrome_versions)
     facebook_post_div = models.CharField(max_length=200, default="div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
     facebook_ads_div = models.CharField(max_length=200, default="div.search__result__wrapper")
+    is_iframe = models.BooleanField(default=False)
     direct_urls = models.TextField(default="",null=True,blank=True)
     urls = models.TextField(default="",null=True,blank=True)
     keywords = models.TextField(default="",null=True,blank=True)

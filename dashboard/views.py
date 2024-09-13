@@ -68,6 +68,7 @@ def getcampaigns(request,user):
             'domain_name': campaign.domain_name,
             'facebook_post_div': campaign.facebook_post_div,
             'facebook_ads_div': campaign.facebook_ads_div,
+            'is_iframe': campaign.is_iframe,
             'urls': urls,
             'click_anywhere': campaign.click_anywhere,
             'mainurls': campaign.urls.split(','),
