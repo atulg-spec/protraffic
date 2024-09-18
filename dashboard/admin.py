@@ -25,6 +25,7 @@ class CampaignsAdmin(admin.ModelAdmin):
 
 # Register PageBehaviour separately
 admin.site.register(PageBehaviour)
+admin.site.register(CampaignPage)
 
 # Optionally, register the through model CampaignPage if you need it in the admin panel
 @admin.register(CampaignPage)

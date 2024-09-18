@@ -1,0 +1,91 @@
+OnePlus 8 Pro: 412 x 915
+OnePlus Nord: 412 x 915
+Samsung Galaxy S21 Ultra: 412 x 915
+Xiaomi Redmi Note 10 Pro: 393 x 873
+Realme 7 Pro: 393 x 873
+Samsung Galaxy M51: 412 x 915
+Vivo V20 Pro: 412 x 915
+Oppo F17 Pro: 393 x 873
+Apple iPhone 12 Pro Max: 428 x 926
+Google Pixel 5: 393 x 851
+Motorola Moto G9 Power: 360 x 780
+Nokia 5.4: 360 x 780
+Sony Xperia 1 II: 384 x 854
+Huawei P40 Pro: 412 x 869
+Asus ROG Phone 3: 412 x 915
+Realme X7 Pro: 393 x 873
+Xiaomi Mi 10: 393 x 851
+Oppo Reno 5 Pro 5G: 393 x 873
+Samsung Galaxy A71: 412 x 915
+Vivo Y51: 393 x 873
+OnePlus 7T: 412 x 892
+Samsung Galaxy Z Fold2: 412 x 915 (Main screen) / 362 x 800 (Folded)
+Xiaomi Mi 10T Pro: 393 x 873
+Oppo Find X2 Pro: 412 x 915
+Vivo X50 Pro: 393 x 873
+Realme Narzo 20 Pro: 393 x 873
+OnePlus Nord 2: 412 x 915
+Samsung Galaxy A52: 412 x 915
+Xiaomi Poco X3: 393 x 873
+Realme 8 Pro: 393 x 873
+Samsung Galaxy S20 FE: 412 x 915
+Apple iPhone 11: 414 x 896
+Google Pixel 4a: 393 x 851
+Nokia 7.2: 412 x 892
+Huawei Nova 7i: 393 x 851
+Motorola One Fusion+: 393 x 873
+Sony Xperia 5 II: 384 x 854
+Asus ZenFone 7 Pro: 412 x 915
+Oppo A53: 360 x 800
+Samsung Galaxy M31: 412 x 915
+Vivo V21 5G: 393 x 873
+Xiaomi Poco X3 NFC: 393 x 873
+Samsung Galaxy A72: 412 x 915
+Oppo A94: 393 x 873
+Apple iPhone 12 mini: 375 x 812
+Google Pixel 3a: 393 x 851
+Huawei P30: 412 x 847
+Motorola Edge 20 Pro: 393 x 873
+Sony Xperia L4: 360 x 780
+Asus ZenFone Max Pro M1: 360 x 800
+OnePlus 6T: 412 x 846
+Samsung Galaxy Note 9: 412 x 846
+Xiaomi Mi 9: 393 x 851
+Realme 3 Pro: 393 x 873
+Samsung Galaxy A50: 412 x 846
+Apple iPhone XR: 414 x 896
+Huawei P20 Pro: 412 x 846
+Oppo F9 Pro: 393 x 851
+Google Pixel 3: 412 x 824
+Sony Xperia XZ3: 412 x 846
+Vivo V11 Pro: 393 x 851
+Nokia 7 Plus: 412 x 846
+Motorola Moto G7 Plus: 412 x 846
+Xiaomi Redmi Note 7 Pro: 393 x 851
+Samsung Galaxy S10+: 412 x 869
+OnePlus 7 Pro: 412 x 869
+Realme X: 393 x 851
+Samsung Galaxy M30: 393 x 851
+Huawei Mate 20 Pro: 412 x 840
+Google Pixel 4 XL: 412 x 869
+Apple iPhone 11 Pro Max: 414 x 896
+Xiaomi Redmi K20 Pro: 393 x 851
+Samsung Galaxy S10e: 412 x 869
+Oppo Reno 10x Zoom: 393 x 851
+Vivo Nex: 412 x 869
+Nokia 8.1: 412 x 846
+Motorola Moto Z4: 412 x 846
+Asus ROG Phone II: 412 x 869
+Samsung Galaxy M40: 393 x 851
+OnePlus 7T Pro: 412 x 869
+Realme 5 Pro: 393 x 851
+Apple iPhone SE (2020): 375 x 667
+Google Pixel 4a 5G: 393 x 851
+Xiaomi Poco F2 Pro: 393 x 873
+Samsung Galaxy Z Flip: 412 x 869
+Huawei Mate 30 Pro: 412 x 840
+Oppo Find X2: 412 x 915
+Realme Narzo 10: 360 x 800
+OnePlus 8T: 393 x 873
+Samsung Galaxy S20 Ultra: 412 x 915
+Vivo NEX 3S 5G: 412 x 840

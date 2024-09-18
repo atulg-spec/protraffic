@@ -122,7 +122,7 @@ class CampaignPage(models.Model):
 
     class Meta:
         ordering = ['sequence']  # Ensures pages are retrieved in the correct order
-        unique_together = ('campaign', 'sequence')  # Ensures unique sequence number within a campaign
+        # unique_together = ('campaign', 'sequence')  # Ensures unique sequence number within a campaign
 
 
 class Campaigns(models.Model):
