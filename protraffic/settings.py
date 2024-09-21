@@ -112,7 +112,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000  # Adjust this number based on your requi
 STATIC_URL = 'static/'
 MEDIA_URL="/media/"
 MEDIA_ROOT = 'media'
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # This is where static files will be collected
 
 # STATICFILES_DIRS =[
 #     os.path.join(BASE_DIR, "static"),
