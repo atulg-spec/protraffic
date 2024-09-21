@@ -6,6 +6,42 @@ from multiselectfield import MultiSelectField
 import pytz
 import threading
 import requests
+import random
+
+def generate_combination(length):
+    characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    comb = ''.join(random.sample(characters, length))
+    return comb
+
+
+def modify_proxy(proxy,length):
+    parts = proxy.split(':')
+    
+    if len(parts) < 3:
+        print("Proxy format is incorrect.")
+        return "Proxy format is incorrect."
+
+    # Extract the part that contains the country and session info
+    country_session_part = parts[0]
+    segments = country_session_part.split('-')
+    
+    # Replace the country code
+    # Generate combinations for the session string
+    if len(segments) > 6:
+        combination = generate_combination(length)
+        
+        new_segments = segments.copy()
+        new_segments[6] = combination  # Replace session string
+        new_proxy_part = '-'.join(new_segments)
+        new_proxy = f"{new_proxy_part}:{parts[1]}:{parts[2]}"
+        if len(parts) > 3:
+            new_proxy += f":{':'.join(parts[3:])}"
+        
+        return new_proxy
+    else:
+        print("Could not find session string in the expected position.")
+        return "Proxy format is incorrect"
+
 
 CONTINENTS = {
     'Africa': [],
@@ -146,6 +182,8 @@ class Campaigns(models.Model):
     direct_traffic = models.BooleanField(default=False)
     click_anywhere = models.BooleanField(default=False)
     pages = models.ManyToManyField(PageBehaviour, through='CampaignPage')  # Use the through model
+    session_string_length = models.PositiveIntegerField(default=12)
+    main_proxy = models.CharField(max_length=255,null=True,blank=True)
     cookies_folder = models.CharField(max_length=50, default="Empty")
     proxy_file = models.FileField(upload_to='proxies/',null=True,blank=True)
 
@@ -157,6 +195,13 @@ class Campaigns(models.Model):
         return self.campaign_name
 
     def save(self, *args, **kwargs):
+        if self.main_proxy.strip() != "":
+            if ':' in self.main_proxy and '@' not in self.main_proxy:
+                parts = self.main_proxy.split(':')
+                if len(parts) == 4:
+                    self.main_proxy = f'{parts[2]}:{parts[3]}@{parts[0]}:{parts[1]}'
+            super().save(*args, **kwargs)
+
         if self.continent:
             self.time_zone = CONTINENTS.get(self.continent, [])
 
@@ -185,6 +230,7 @@ class Campaigns(models.Model):
 class Proxy(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='proxies')
     proxy = models.CharField(max_length=255)
+    count = models.PositiveIntegerField(default=1)
 
     # Fields to store IP-related data
     ip_address = models.CharField(max_length=45, blank=True, null=True)
@@ -215,10 +261,26 @@ class Proxy(models.Model):
 
         # Save the model first to ensure the primary key exists
         super().save(*args, **kwargs)
-
+        
         # Perform the operation in a new thread only if the instance is newly created
         if is_new and self.status == 'FETCHING':
             threading.Thread(target=self.fetch_and_save_ip_details).start()
+        
+        if self.count > 1:
+            threading.Thread(target=self.add_proxy).start()
+
+    def add_proxy(self):
+        count = self.count
+        for i in range(0,count):
+            try:
+                pr = modify_proxy(self.campaign.main_proxy,self.campaign.session_string_length)
+                Proxy.objects.create(campaign=self.campaign,proxy=pr)
+            except:
+                try:
+                    pr = modify_proxy(self.campaign.main_proxy,self.campaign.session_string_length)
+                    Proxy.objects.create(campaign=self.campaign,proxy=pr)
+                except:
+                    pass
 
     def fetch_and_save_ip_details(self):
         import time
@@ -359,6 +421,8 @@ class UserAgentsFile(models.Model):
         return self.file.name if self.file else "User Agents Upload"
 
 
+
+
 class Tasks(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ManyToManyField(User)
@@ -378,10 +442,25 @@ class Tasks(models.Model):
         verbose_name_plural = "Tasks"
 
     def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        if is_new:
+            threading.Thread(target=self.add_proxy).start()
         super().save(*args, **kwargs)
         if self.repetition_count <= self.repetition_done:
             self.status = 'completed'
             super().save(*args, **kwargs)
 
+    def add_proxy(self):
+        count = self.profile * self.repetition_count
+        for i in range(0,count*2):
+            try:
+                pr = modify_proxy(self.campaign.main_proxy,self.campaign.session_string_length)
+                Proxy.objects.create(campaign=self.campaign,proxy=pr)
+            except:
+                try:
+                    pr = modify_proxy(self.campaign.main_proxy,self.campaign.session_string_length)
+                    Proxy.objects.create(campaign=self.campaign,proxy=pr)
+                except:
+                    pass
     def __str__(self):
         return f'{self.campaign.campaign_name} - at {self.schedule_at}'

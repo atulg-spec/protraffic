@@ -18,7 +18,7 @@ class CampaignsAdmin(admin.ModelAdmin):
         ('Browser Settings', {'fields': ('user_agents', 'facebook_post_div', 'facebook_ads_div', 'is_iframe')}),
         ('Campaign Info', {'fields': ('urls', 'keywords','direct_urls' ,'search_engines')}),
         ('Scroll Behaviour', {'fields': ('visit_count_from', 'visit_count_to', 'direct_traffic', 'click_anywhere','selection_on_page')}),
-        ('Extensions', {'fields': ('cookies_folder', 'proxy_file')}),
+        ('Extensions', {'fields': ('session_string_length','main_proxy','cookies_folder', 'proxy_file')}),
     )
     
     inlines = [CampaignPageInline]  # Adding the inline model for pages
@@ -35,8 +35,8 @@ class CampaignPageAdmin(admin.ModelAdmin):
 admin.site.register(SearchEngine)
 
 class ProxyAdmin(admin.ModelAdmin):
-    list_display = ('campaign', 'proxy', 'ip_address', 'city', 'region', 'country', 'timezone','status')
-    search_fields = ('proxy', 'ip_address', 'city', 'region', 'country')
+    list_display = ('campaign', 'proxy', 'ip_address', 'city', 'region', 'country', 'timezone','status','count')
+    search_fields = ('proxy', 'count', 'ip_address', 'city', 'region', 'country')
     list_filter = ('campaign', 'country', 'region', 'city','status')
     readonly_fields = ('ip_address', 'city', 'region', 'country', 'latitude', 'longitude', 'timezone','status')
 
