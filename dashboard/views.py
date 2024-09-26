@@ -84,6 +84,7 @@ def getcampaigns(request,user):
                 urls = urls + [f'https://duckduckgo.com/?q={keyword}' for keyword in keywords]
         campaign_data = {
             'id': campaign.id,
+            'direct_traffic': campaign.direct_traffic,
             'created_at': campaign.created_at.strftime('%Y-%m-%d %H:%M:%S') if campaign.created_at else None,
             'campaign_name': campaign.campaign_name,
             'facebook_campaign': task.facebook_campaign,
