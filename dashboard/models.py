@@ -122,15 +122,28 @@ class SearchEngine(models.Model):
 class User_agents(models.Model):
     id = models.AutoField(primary_key=True)
     chrome_version = models.ForeignKey(Chrome_versions, on_delete=models.CASCADE)
-    user_agent = models.CharField(max_length=200,default="")
+    user_agent = models.CharField(max_length=400,default="")
     width = models.PositiveIntegerField(default=1536)
     height = models.PositiveIntegerField(default=864)
+    visitor_id = models.CharField(max_length=400,default="")
+    canvas = models.CharField(max_length=400,default="")
+    WebGL = models.CharField(max_length=400,default="")
+    WebGL_report = models.CharField(max_length=400,default="")
+    unmasked_vendor = models.CharField(max_length=400,default="")
+    unmasked_renderer = models.CharField(max_length=400,default="")
+    audio = models.CharField(max_length=400,default="")
+    client_rects = models.CharField(max_length=400,default="")
+    webGPU_report = models.CharField(max_length=400,default="")
+    screen_resolution = models.CharField(max_length=400,default="")
+    color_depth = models.CharField(max_length=400,default="")
+    touch_support = models.CharField(max_length=400,default="")
+    device_memory = models.CharField(max_length=400,default="")
+    hardware_concurrency = models.CharField(max_length=400,default="")
     isMobile = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('chrome_version', 'user_agent')
-        verbose_name = "User Agent"
-        verbose_name_plural = "User Agents"
+        verbose_name = "Device"
+        verbose_name_plural = "Devices"
 
     def __str__(self):
         return f'{self.user_agent}'
@@ -442,9 +455,9 @@ class Tasks(models.Model):
         verbose_name_plural = "Tasks"
 
     def save(self, *args, **kwargs):
-        is_new = self._state.adding
-        if is_new:
-            threading.Thread(target=self.add_proxy).start()
+        # is_new = self._state.adding
+        # if is_new:
+        #     threading.Thread(target=self.add_proxy).start()
         super().save(*args, **kwargs)
         if self.repetition_count <= self.repetition_done:
             self.status = 'completed'

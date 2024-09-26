@@ -61,10 +61,14 @@ class Tasks(admin.ModelAdmin):
     )
 
 
-@admin.register(User_agents)
-class User_agents(admin.ModelAdmin):
-    list_display = ('chrome_version','user_agent','width','height','isMobile')
-    list_filter = ('chrome_version','isMobile')
+class UserAgentsAdmin(admin.ModelAdmin):
+    list_display = (
+        'unmasked_vendor', 'unmasked_renderer', 'user_agent', 'width', 'height', 'visitor_id', 'canvas', 'WebGL'
+    )
+    search_fields = ('user_agent', 'visitor_id', 'chrome_version__version')
+    list_filter = ('isMobile', 'chrome_version')
+
+admin.site.register(User_agents, UserAgentsAdmin)
 
 @admin.register(Proxyfile)
 class Proxyfile(admin.ModelAdmin):

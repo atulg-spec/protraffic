@@ -39,7 +39,27 @@ def getcampaigns(request,user):
         for x in campaign.user_agents.all():
             ob = User_agents.objects.filter(chrome_version=x)
             for y in ob:
-                user_agents.append({'userAgents':y.user_agent,'width':y.width,'height':y.height,'isMobile':y.isMobile})
+                user_agents.append(
+                    {
+                        'userAgents':y.user_agent,
+                        'width':y.width,
+                        'height':y.height,
+                        'visitor_id':y.visitor_id,
+                        'canvas':y.canvas,
+                        'WebGL':y.WebGL,
+                        'WebGL_report':y.WebGL_report,
+                        'unmasked_renderer':y.unmasked_renderer,
+                        'audio':y.audio,
+                        'client_rects':y.client_rects,
+                        'webGPU_report':y.webGPU_report,
+                        'screen_resolution':y.screen_resolution,
+                        'color_depth':y.color_depth,
+                        'touch_support':y.touch_support,
+                        'device_memory':y.device_memory,
+                        'hardware_concurrency':y.hardware_concurrency,
+                        'isMobile':y.isMobile
+                    }
+                    )
         if proxiyOb:
             proxies = {proxy.proxy:proxy.timezone for proxy in proxiyOb}
             for x in proxiyOb:
