@@ -185,6 +185,8 @@ class Campaigns(models.Model):
     facebook_post_div = models.CharField(max_length=200, default="div.x11i5rnm.xat24cr.x1mh8g0r.x1vvkbs.xtlvy1s.x126k92a")
     facebook_ads_div = models.CharField(max_length=200, default="div.search__result__wrapper")
     is_iframe = models.BooleanField(default=False)
+    use_login_profiles = models.BooleanField(default=False)
+    profiles_tag = models.CharField(max_length=50, default="",null=True,blank=True)
     direct_urls = models.TextField(default="",null=True,blank=True)
     urls = models.TextField(default="",null=True,blank=True)
     keywords = models.TextField(default="",null=True,blank=True)
@@ -447,6 +449,9 @@ class Tasks(models.Model):
     campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE, related_name='tasks')
     schedule_at = models.DateTimeField(default=timezone.now)
     status = models.CharField(max_length=100, choices=STATUS, default="created")
+    youtube_views = models.BooleanField(default=False)
+    youtube_subscribe = models.BooleanField(default=False)
+    make_google_logins = models.BooleanField(default=False)
     facebook_campaign = models.BooleanField(default=False)
 
     class Meta:
@@ -455,9 +460,6 @@ class Tasks(models.Model):
         verbose_name_plural = "Tasks"
 
     def save(self, *args, **kwargs):
-        # is_new = self._state.adding
-        # if is_new:
-        #     threading.Thread(target=self.add_proxy).start()
         super().save(*args, **kwargs)
         if self.repetition_count <= self.repetition_done:
             self.status = 'completed'
