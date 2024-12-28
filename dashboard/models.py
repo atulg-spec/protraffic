@@ -452,6 +452,7 @@ class Tasks(models.Model):
     youtube_views = models.BooleanField(default=False)
     youtube_subscribe = models.BooleanField(default=False)
     make_google_logins = models.BooleanField(default=False)
+    create_google_accounts = models.BooleanField(default=False)
     facebook_campaign = models.BooleanField(default=False)
 
     class Meta:

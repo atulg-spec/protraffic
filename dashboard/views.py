@@ -112,6 +112,34 @@ def getcampaigns(request,user):
             }
             # Return JSON response
             return JsonResponse({'status':True,'data':campaign_data}, safe=False)
+        elif task.create_google_accounts:
+            pages_with_sequence = CampaignPage.objects.filter(campaign=campaign).order_by('sequence')
+            # Prepare the pages list in the desired format
+            pages_data = [{
+                'sequence': page.sequence,
+                'scroll_duration_from': page.page.scroll_duration_from,
+                'scroll_duration_to': page.page.scroll_duration_to,  # Replace 'name' with actual field names
+                'click_selector': page.page.click_selector,  # Replace 'name' with actual field names
+                'is_iframe': page.page.is_iframe,  # Replace 'name' with actual field names
+            } for page in pages_with_sequence]
+            campaign_data = {
+                'id': campaign.id,
+                'campaign_name': campaign.campaign_name,
+                'pages': pages_data,
+                'profileTag': f'{campaign.profiles_tag}',
+                'urls': campaign.urls.split(','),
+                'create_google_accounts': task.create_google_accounts,
+                'youtube_views': False,
+                'youtube_subscribe': False,
+                'make_google_logins': False,
+                'facebook_campaign': False,
+                'profile_delay': task.profile_delay,
+                'proxies': proxies,
+                'cookies_folder': campaign.cookies_folder,
+                'user_agents': user_agents,
+            }
+            # Return JSON response
+            return JsonResponse({'status':True,'data':campaign_data}, safe=False)
         else:
             campaign_time = (10 * task.profile) + 60
             pages_with_sequence = CampaignPage.objects.filter(campaign=campaign).order_by('sequence')

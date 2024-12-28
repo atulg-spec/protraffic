@@ -11,6 +11,7 @@ class CampaignsAdmin(admin.ModelAdmin):
     list_display = ('campaign_name', 'domain_name', 'created_at', 'direct_traffic')
     list_filter = ('domain_name', 'created_at', 'time_zone')
     search_fields = ('campaign_name', 'domain_name', 'keywords', 'urls')
+    filter_horizontal = ('user_agents',)
     
     fieldsets = (
         (None, {'fields': ('campaign_name', 'domain_name')}),
@@ -57,7 +58,7 @@ class Tasks(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('user','status')}),
         ('Campaign Settings', {'fields': ('campaign','profile','profile_delay','repetition_count','repetition_done')}),
-        ('Task Type', {'fields': ('youtube_views','youtube_subscribe','make_google_logins','facebook_campaign')}),
+        ('Task Type', {'fields': ('youtube_views','youtube_subscribe','make_google_logins','facebook_campaign','create_google_accounts')}),
         ('Scheduling', {'fields': ('schedule_at',)}),
     )
 
